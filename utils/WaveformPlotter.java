@@ -68,11 +68,11 @@ public class WaveformPlotter implements GLEventListener {
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int w, int h) {
         GL2 gl = drawable.getGL().getGL2();
-        gl.glMatrixMode(GLMatrixFunc.GL_PROJECTION);
+        gl.glMatrixMode(GL2.GL_PROJECTION);
         gl.glLoadIdentity();
         float aspect = (float) w / h;
         gl.glOrtho(-1 * aspect, 1 * aspect, -1, 1, -1, 1);
-        gl.glMatrixMode(GLMatrixFunc.GL_MODELVIEW);
+        gl.glMatrixMode(GL2.GL_MODELVIEW);
         gl.glLoadIdentity();
     }
 }

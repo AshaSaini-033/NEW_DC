@@ -49,15 +49,20 @@ public class Main {
                 System.exit(0);
         }
 
+        StringBuilder sb = new StringBuilder();
+        for (int bit : digitalData) {
+            sb.append(bit);
+        }
+        String digitalDataString = sb.toString();
         System.out.println("\nDigital Data Stream: " + Arrays.toString(digitalData));
-        System.out.println("Longest Palindrome: " + Utils.longestPalindrome(Arrays.toString(digitalData)));
+        System.out.println("Longest Palindrome: " + Utils.longestPalindrome(digitalDataString));
         System.out.println("\nEncoded Signal: " + Arrays.toString(encoded));
 
         WaveformPlotter.displayWaveform(encoded, "Encoded Signal");
 
         System.out.print("\nDo you want to decode? (yes/no): ");
         if (sc.next().equalsIgnoreCase("yes")) {
-            int[] decoded = Decoder.decode(encoded, choice);
+            int[] decoded = encoder.Decoder.decode(encoded, choice);
             System.out.println("Decoded Data: " + Arrays.toString(decoded));
             WaveformPlotter.displayWaveform(decoded, "Decoded Signal");
         }

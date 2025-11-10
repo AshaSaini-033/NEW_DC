@@ -1,5 +1,6 @@
-import encoder.*;
 import utils.*;
+import encoder.*;
+
 import java.util.*;
 
 public class Main {

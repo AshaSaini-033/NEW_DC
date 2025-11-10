@@ -1,54 +1,76 @@
 package encoder;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class LineEncoder {
 
-    public static int[] nrzl(int[] data) {
-        int[] encoded = new int[data.length];
-        for (int i = 0; i < data.length; i++)
-            encoded[i] = data[i] == 1 ? 1 : -1;
-        return encoded;
-    }
-
-    public static int[] nrzi(int[] data) {
-        int[] encoded = new int[data.length];
-        int level = 1;
-        for (int i = 0; i < data.length; i++) {
-            if (data[i] == 1) level = -level;
-            encoded[i] = level;
+    // NRZ-L: 1 -> negative voltage, 0 -> positive voltage
+    public static int[] nrzl(int[] bits) {
+        int[] encoded = new int[bits.length];
+        for (int i = 0; i < bits.length; i++) {
+            encoded[i] = (bits[i] == 1) ? -1 : 1;
         }
         return encoded;
     }
 
-    public static int[] manchester(int[] data) {
-        int[] encoded = new int[data.length * 2];
-        for (int i = 0; i < data.length; i++) {
-            encoded[2 * i] = data[i] == 1 ? 1 : -1;
-            encoded[2 * i + 1] = -encoded[2 * i];
+    // NRZ-I: 1 -> transition, 0 -> no transition
+    public static int[] nrzi(int[] bits) {
+        int[] encoded = new int[bits.length];
+        int currentLevel = 1; // Start with a positive level
+        for (int i = 0; i < bits.length; i++) {
+            if (bits[i] == 1) {
+                currentLevel *= -1; // Invert level for a '1'
+            }
+            encoded[i] = currentLevel;
         }
         return encoded;
     }
 
-    public static int[] diffManchester(int[] data) {
-        int[] encoded = new int[data.length * 2];
-        int last = 1;
-        for (int i = 0; i < data.length; i++) {
-            if (data[i] == 0) last = -last;
-            encoded[2 * i] = last;
-            encoded[2 * i + 1] = -last;
+    // Manchester: 0 -> high-to-low transition, 1 -> low-to-high transition
+    public static int[] manchester(int[] bits) {
+        List<Integer> encodedList = new ArrayList<>();
+        for (int bit : bits) {
+            if (bit == 0) {
+                encodedList.add(1);
+                encodedList.add(-1);
+            } else { // bit == 1
+                encodedList.add(-1);
+                encodedList.add(1);
+            }
         }
-        return encoded;
+        return encodedList.stream().mapToInt(i -> i).toArray();
     }
 
-    public static int[] ami(int[] data) {
-        int[] encoded = new int[data.length];
-        int last = -1;
-        for (int i = 0; i < data.length; i++) {
-            if (data[i] == 1) {
-                last = -last;
-                encoded[i] = last;
-            } else encoded[i] = 0;
+    // Differential Manchester: 0 -> transition at start, 1 -> no transition at start
+    // Always a transition in the middle of the bit interval.
+    public static int[] diffManchester(int[] bits) {
+        List<Integer> encodedList = new ArrayList<>();
+        int currentLevel = 1; // Start with a positive level
+        for (int bit : bits) {
+            if (bit == 0) {
+                currentLevel *= -1; // Transition at the start for '0'
+            }
+            // Middle transition
+            encodedList.add(currentLevel);
+            currentLevel *= -1;
+            encodedList.add(currentLevel);
+        }
+        return encodedList.stream().mapToInt(i -> i).toArray();
+    }
+
+    // AMI: 0 -> 0V, 1 -> alternating +V and -V
+    public static int[] ami(int[] bits) {
+        int[] encoded = new int[bits.length];
+        int lastNonZero = -1; // Start with negative polarity for the first '1'
+        for (int i = 0; i < bits.length; i++) {
+            if (bits[i] == 0) {
+                encoded[i] = 0;
+            } else {
+                encoded[i] = -lastNonZero;
+                lastNonZero = encoded[i];
+            }
         }
         return encoded;
     }
 }
-
